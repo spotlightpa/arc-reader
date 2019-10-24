@@ -1,3 +1,4 @@
+github.com/BurntSushi/toml v0.3.1 h1:WXkYYl6Yr3qBf1K79EBnL4mak0OimBfB0XUf9Vl28OQ=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/carlmjohnson/exitcode v0.0.3 h1:TI8znPyuJdilIlLHqotKizJXBCHp5rkGq6YuJVqyxd0=
 github.com/carlmjohnson/exitcode v0.0.3/go.mod h1:xF8lj5nU2WLjbHlSOQS1dCa8WjOP38cihHLRD3/fXMI=

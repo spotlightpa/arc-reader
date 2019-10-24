@@ -1,17 +1,20 @@
 package app
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io"
 	"log"
 	"os"
 
+	"github.com/BurntSushi/toml"
 	"github.com/carlmjohnson/flagext"
 	"github.com/peterbourgon/ff"
+	"github.com/spotlightpa/arc-reader/internal/feed"
 )
 
-const AppName = "go-cli"
+const AppName = "arc-reader"
 
 func CLI(args []string) error {
 	a, err := parseArgs(args)
@@ -38,40 +41,55 @@ func parseArgs(args []string) (*app, error) {
 	)
 
 	fl.Usage = func() {
-		fmt.Fprintf(fl.Output(), `go-cli - a Go CLI application template cat clone
+		fmt.Fprintf(fl.Output(), `arc-reader
 
 Usage:
 
-	go-cli [options]
+	arc-reader [options]
 
 Options:
 `)
 		fl.PrintDefaults()
 	}
-	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("GO_CLI")); err != nil {
+	if err := ff.Parse(fl, args, ff.WithEnvVarPrefix("ARC_READER")); err != nil {
 		return nil, err
 	}
-	a := app{src, l}
+
+	id := fl.Arg(0)
+	a := app{src, l, id}
 	return &a, nil
 }
 
 type app struct {
 	src io.ReadCloser
 	*log.Logger
+	id string
 }
 
 func (a *app) exec() (err error) {
 	a.Println("starting")
-	defer func() { a.Println("done") }()
-
-	n, err := io.Copy(os.Stdout, a.src)
-	defer func() {
-		e2 := a.src.Close()
-		if err == nil {
-			err = e2
+	dec := json.NewDecoder(a.src)
+	var f feed.Feed
+	if err = dec.Decode(&f); err != nil {
+		return err
+	}
+	var body string
+	var v interface{} = f
+	if a.id != "" {
+		v = nil
+		for _, s := range f.Stories {
+			if s.ID == a.id {
+				v = s
+				body = s.Body
+			}
 		}
-	}()
-	a.Printf("copied %d bytes\n", n)
+	}
 
+	io.WriteString(os.Stdout, "+++\n")
+	enc := toml.NewEncoder(os.Stdout)
+	if err = enc.Encode(v); err != nil {
+		return err
+	}
+	io.WriteString(os.Stdout, "+++\n\n"+body+"\n")
 	return err
 }

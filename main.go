@@ -4,7 +4,7 @@ import (
 	"os"
 
 	"github.com/carlmjohnson/exitcode"
-	"github.com/carlmjohnson/go-cli/app"
+	"github.com/spotlightpa/arc-reader/app"
 )
 
 func main() {
