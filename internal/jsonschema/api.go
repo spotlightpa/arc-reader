@@ -1,6 +1,9 @@
 package jsonschema
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type API struct {
 	Version  string     `json:"apiVersion"`
@@ -8,47 +11,79 @@ type API struct {
 }
 
 type Contents struct {
-	CanonicalURL     string            `json:"canonical_url"`
-	CanonicalWebsite string            `json:"canonical_website"`
-	Comments         Comments          `json:"comments"`
-	ContentElements  []ContentElements `json:"content_elements"`
-	CreatedDate      time.Time         `json:"created_date"`
-	Credits          Credits           `json:"credits"`
-	Description      Description       `json:"description"`
-	DisplayDate      time.Time         `json:"display_date,omitempty"`
-	Distributor      Distributor       `json:"distributor"`
-	FirstPublishDate time.Time         `json:"first_publish_date,omitempty"`
-	Headlines        Headlines         `json:"headlines"`
-	ID               string            `json:"_id"`
-	Label            Label             `json:"label"`
-	Language         string            `json:"language"`
-	LastUpdatedDate  time.Time         `json:"last_updated_date"`
-	Owner            Owner             `json:"owner"`
-	Planning         Planning          `json:"planning"`
-	PublishDate      time.Time         `json:"publish_date,omitempty"`
-	Publishing       Publishing        `json:"publishing"`
-	Slug             string            `json:"slug"`
-	Source           Source            `json:"source"`
-	Subheadlines     Subheadlines      `json:"subheadlines"`
-	Subtype          string            `json:"subtype"`
-	Syndication      Syndication       `json:"syndication"`
-	Type             string            `json:"type"`
-	Version          string            `json:"version"`
-	Website          string            `json:"website"`
-	WebsiteURL       string            `json:"website_url,omitempty"`
-	Workflow         Workflow          `json:"workflow,omitempty"`
+	CanonicalURL     string             `json:"canonical_url"`
+	CanonicalWebsite string             `json:"canonical_website"`
+	Comments         Comments           `json:"comments"`
+	ContentElements  []*json.RawMessage `json:"content_elements"`
+	CreatedDate      time.Time          `json:"created_date"`
+	Credits          Credits            `json:"credits"`
+	Description      Description        `json:"description"`
+	DisplayDate      time.Time          `json:"display_date,omitempty"`
+	Distributor      Distributor        `json:"distributor"`
+	FirstPublishDate time.Time          `json:"first_publish_date,omitempty"`
+	Headlines        Headlines          `json:"headlines"`
+	ID               string             `json:"_id"`
+	Label            Label              `json:"label"`
+	Language         string             `json:"language"`
+	LastUpdatedDate  time.Time          `json:"last_updated_date"`
+	Owner            Owner              `json:"owner"`
+	Planning         Planning           `json:"planning"`
+	PromoItems       PromoItems         `json:"promo_items"`
+	PublishDate      time.Time          `json:"publish_date,omitempty"`
+	Publishing       Publishing         `json:"publishing"`
+	Slug             string             `json:"slug"`
+	Source           Source             `json:"source"`
+	Subheadlines     Subheadlines       `json:"subheadlines"`
+	Subtype          string             `json:"subtype"`
+	Syndication      Syndication        `json:"syndication"`
+	Type             string             `json:"type"`
+	Version          string             `json:"version"`
+	Website          string             `json:"website"`
+	WebsiteURL       string             `json:"website_url,omitempty"`
+	Workflow         Workflow           `json:"workflow,omitempty"`
 }
 
-type ContentElements struct {
-	ID        string    `json:"_id"`
-	Type      string    `json:"type"`
-	Content   string    `json:"content"`
-	Caption   string    `json:"caption"`
-	Level     int       `json:"level"`
-	Owner     Owner     `json:"owner"`
+type _contentElement struct {
+	ID        string            `json:"_id"`
+	Type      string            `json:"type"`
+	Content   string            `json:"content"`
+	Caption   string            `json:"caption"`
+	Items     []_contentElement `json:"items,omitempty"`
+	Level     int               `json:"level"`
+	ListType  string            `json:"list_type"`
+	Owner     Owner             `json:"owner"`
+	RawOembed RawOembed         `json:"raw_oembed"`
+	URL       string            `json:"url"`
+	Width     int               `json:"width"`
+}
+
+type ContentElementType struct {
+	Type *string `json:"type"`
+}
+
+type ContentElementText struct {
+	Content *string `json:"content"`
+}
+
+type ContentElementHeading struct {
+	Content string `json:"content"`
+	Level   int    `json:"level"`
+}
+
+type ContentElementImage struct {
+	Credits Credits `json:"credits"`
+	Caption string  `json:"caption"`
+	URL     string  `json:"url"`
+	Width   int     `json:"width"`
+}
+
+type ContentElementList struct {
+	Items    []struct{ Type, Content string } `json:"items"`
+	ListType string                           `json:"list_type"`
+}
+
+type ContentElementOembed struct {
 	RawOembed RawOembed `json:"raw_oembed"`
-	URL       string    `json:"url"`
-	Width     int       `json:"width"`
 }
 
 type RawOembed struct {
@@ -185,4 +220,64 @@ type Revision struct {
 
 type Taxonomy struct {
 	SeoKeywords []string `json:"seo_keywords"`
+}
+
+type PromoItems struct {
+	Basic struct {
+		ID                   string `json:"_id"`
+		AdditionalProperties struct {
+			FullSizeResizeURL string        `json:"fullSizeResizeUrl"`
+			Galleries         []interface{} `json:"galleries"`
+			MimeType          string        `json:"mime_type"`
+			OriginalName      string        `json:"originalName"`
+			OriginalURL       string        `json:"originalUrl"`
+			ProxyURL          string        `json:"proxyUrl"`
+			Published         bool          `json:"published"`
+			ResizeURL         string        `json:"resizeUrl"`
+			Restricted        bool          `json:"restricted"`
+			TakenOn           time.Time     `json:"takenOn"`
+			Version           int           `json:"version"`
+		} `json:"additional_properties"`
+		Caption     string      `json:"caption"`
+		CreatedDate time.Time   `json:"created_date"`
+		Credits     PromoCredit `json:"credits"`
+		Distributor struct {
+			AdditionalProperties struct {
+			} `json:"additional_properties"`
+			Category string `json:"category"`
+			Name     string `json:"name"`
+		} `json:"distributor"`
+		Height          int       `json:"height"`
+		LastUpdatedDate time.Time `json:"last_updated_date"`
+		Licensable      bool      `json:"licensable"`
+		Owner           struct {
+			ID   string `json:"id"`
+			Name string `json:"name"`
+		} `json:"owner"`
+		Source struct {
+			AdditionalProperties struct {
+				ClickabilityID string `json:"clickability_id"`
+			} `json:"additional_properties"`
+			Name       string `json:"name"`
+			SourceID   string `json:"source_id"`
+			SourceType string `json:"source_type"`
+			System     string `json:"system"`
+		} `json:"source"`
+		Type    string `json:"type"`
+		URL     string `json:"url"`
+		Version string `json:"version"`
+		Width   int    `json:"width"`
+	} `json:"basic"`
+}
+
+type PromoCredit struct {
+	Affiliation []struct {
+		Name string `json:"name"`
+		Type string `json:"type"`
+	} `json:"affiliation"`
+	By []struct {
+		Byline string `json:"byline"`
+		Name   string `json:"name"`
+		Type   string `json:"type"`
+	} `json:"by"`
 }
