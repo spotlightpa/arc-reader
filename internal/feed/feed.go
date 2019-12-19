@@ -32,17 +32,20 @@ func (f *Feed) UnmarshalJSON(data []byte) error {
 }
 
 type Story struct {
-	ID        string    `toml:"internal-id"`
-	Slug      string    `toml:"slug"`
-	PubDate   time.Time `toml:"published"`
-	Budget    string    `toml:"internal-budget"`
-	Hed       string    `toml:"title"`
-	Subhead   string    `toml:"subtitle"`
-	Summary   string    `toml:"description"`
-	Authors   []string  `toml:"authors"`
-	Image     *Image    `toml:"images,omitempty"`
-	Body      string    `toml:"-"`
-	LinkTitle string    `toml:"linktitle"`
+	ID           string    `toml:"internal-id"`
+	ImageCredit  string    `toml:"image-credit"`
+	ImageCaption string    `toml:"image-description"`
+	ImageURL     string    `toml:"image"`
+	Slug         string    `toml:"slug"`
+	PubDate      time.Time `toml:"published"`
+	Budget       string    `toml:"internal-budget"`
+	Hed          string    `toml:"title"`
+	Subhead      string    `toml:"subtitle"`
+	Summary      string    `toml:"description"`
+	Blurb        string    `toml:"dek"`
+	Authors      []string  `toml:"authors"`
+	Body         string    `toml:"-"`
+	LinkTitle    string    `toml:"linktitle"`
 }
 
 func contentToStory(content jsonschema.Contents) *Story {
@@ -60,10 +63,15 @@ func contentToStory(content jsonschema.Contents) *Story {
 		Hed:       content.Headlines.Basic,
 		Subhead:   content.Subheadlines.Basic,
 		Summary:   content.Description.Basic,
+		Blurb:     content.Description.Basic,
 		Authors:   authors,
-		Image:     imageFrom(content.PromoItems),
 		Body:      body.String(),
 		LinkTitle: content.Headlines.Web,
+	}
+	if image := imageFrom(content.PromoItems); image != nil {
+		story.ImageURL = image.URL
+		story.ImageCaption = image.Caption
+		story.ImageCredit = image.Credit
 	}
 	return &story
 }
